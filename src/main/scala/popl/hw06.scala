@@ -272,7 +272,7 @@ object hw06 extends JsApp {
       case ConstDecl(y, e1, e2) =>
         ConstDecl(y, substX(e1), if (x == y) e2 else substX(e2))
       case Function(p, y, e1) =>
-        Function(p, y, if (x == y || Some(x) == p) e1 else substX(e1))
+        Function(p, y, if (x == y || p.contains(x)) e1 else substX(e1))
       case Call(e1, e2) =>
         Call(substX(e1), substX(e2))
     }
@@ -285,7 +285,7 @@ object hw06 extends JsApp {
       // DoPrint
       case Print(v: Val) =>
         if (debug) println("Applying rule DoPrint")
-        println(v.prettyVal);
+        println(v.prettyVal())
         Undefined
 
       // DoUMinus
@@ -301,7 +301,7 @@ object hw06 extends JsApp {
         Bool(!toBool(v))
 
       // DoSeq
-      case BinOp(Seq, v1: Val, e2) =>
+      case BinOp(Seq, _: Val, e2) =>
         if (debug) println("Applying rule DoSeq")
         e2
 
@@ -449,7 +449,7 @@ object hw06 extends JsApp {
 
       /* Cases that should never match. Your cases above should ensure this. */
       case Var(_) => throw new AssertionError("Internal error: not a closed expression:\n%s".format(e))
-      case v: Val => throw new AssertionError("Internal error: step should not be called on values:\n%s".format(e));
+      case _: Val => throw new AssertionError("Internal error: step should not be called on values:\n%s".format(e));
     }
   }
 
@@ -505,14 +505,14 @@ object hw06 extends JsApp {
       println(expr)
     }
 
-    handle() {
+    handle(()) {
       val v = evaluate(expr)
       println(v.prettyVal())
     }
 
-    handle() {
+    /*handle(()) {
       val v1 = iterateStep(expr)
       println(v1.prettyVal())
-    }
+    }*/
   }
 }
